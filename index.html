@@ -3,10 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GPA Calculator</title>
+  <meta name="theme-color" content="#eef3ef">
+  <meta name="description" content="Calculate your semester GPA using your university's grading scale.">
+  <title>Semester GPA Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <script src="main.js"></script>
+  <main class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Gradebook home"><span class="brand-mark">G</span><span>GRADEBOOK <span class="brand-divider">/</span> STUDENT TOOLS</span></a>
+      <span class="topbar-note"><span class="status-dot"></span> Semester planner</span>
+    </header>
+    <section class="intro" aria-labelledby="page-title">
+      <div><p class="eyebrow">YOUR ACADEMIC SNAPSHOT</p><h1 id="page-title">Semester GPA<br><span>at a glance.</span></h1></div>
+      <p class="intro-copy">Add your courses and grades to see where your semester stands. Your university's grading scale is built right in.</p>
+    </section>
+    <section class="calculator" aria-label="GPA calculator">
+      <div class="course-workspace">
+        <div class="workspace-heading">
+          <div><p class="eyebrow">01 <span class="eyebrow-rule"></span> COURSE DETAILS</p><h2>Build your semester</h2></div>
+          <button class="text-button" id="reset-button" type="button">Reset all</button>
+        </div>
+        <div class="university-field">
+          <label for="university">University grading scale</label>
+          <select id="university" name="university">
+            <option value="muet">Mehran University of Engineering &amp; Technology</option>
+            <option value="sau">Sindh Agriculture University</option>
+            <option value="usindh">University of Sindh</option>
+            <option value="qau">Quaid-e-Azam University Islamabad</option>
+          </select>
+          <p class="field-hint" id="scale-hint"></p>
+        </div>
+        <div class="course-list-heading" aria-hidden="true"><span>COURSE</span><span>TYPE <span class="column-detail">/ CREDITS</span></span><span>GRADE</span><span></span></div>
+        <div class="course-list" id="course-list" aria-label="Courses"></div>
+        <p class="empty-state" id="empty-state" hidden>No courses yet. Add one to get started.</p>
+        <button class="add-course-button" id="add-course-button" type="button"><span class="add-icon" aria-hidden="true">+</span> Add a course</button>
+        <div class="credit-key" aria-label="Credit hours by course type"><span class="credit-key-title">CREDIT WEIGHT</span><span><b>Major</b> 3 credits</span><span><b>Minor</b> 2 credits</span><span><b>Practical</b> 1 credit</span></div>
+      </div>
+      <aside class="results-panel" aria-labelledby="results-title">
+        <div class="results-topline"><p class="eyebrow">02 <span class="eyebrow-rule"></span> LIVE RESULTS</p><span class="live-label"><span class="status-dot"></span> LIVE</span></div>
+        <h2 id="results-title">Your semester</h2>
+        <div class="gpa-display">
+          <div class="gpa-ring" id="gpa-ring" role="img" aria-label="GPA not calculated"><div class="gpa-ring-inner"><span class="gpa-value" id="gpa-value">—</span><span class="gpa-out-of">OUT OF 4.00</span></div></div>
+          <div class="gpa-caption"><span class="gpa-caption-label">SEMESTER GPA</span><strong id="gpa-rating">Ready when you are</strong><span class="gpa-status" id="gpa-status" aria-live="polite">Add a course to begin.</span></div>
+        </div>
+        <div class="result-divider"></div>
+        <div class="stat-list">
+          <div class="stat-row"><span>Enrolled credits</span><strong><span id="credit-total">0</span><small> cr</small></strong></div>
+          <div class="stat-row"><span>Quality points</span><strong id="quality-total">—</strong></div>
+          <div class="stat-row"><span>Courses graded</span><strong id="course-total">0 / 0</strong></div>
+        </div>
+        <div class="results-footnote"><span class="footnote-mark" aria-hidden="true">i</span><p>GPA is weighted by course credits and calculated on a 4.00 scale.</p></div>
+      </aside>
+    </section>
+    <footer class="page-footer"><span>GRADEBOOK</span><span>ONE SEMESTER AT A TIME.</span></footer>
+  </main>
+  <script src="main.js" defer></script>
 </body>
 
 </html>

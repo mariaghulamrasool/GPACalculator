@@ -1,113 +1,139 @@
-let uniNo = parseInt(prompt("  1: Mehran Univerity of Engineering & Technology\n  2: Sindh Agriculture University\n   3: University of Sindh\n   4:Quaid e Azam University Islamabad \n\n Enter your university no(i.e MUET 1): "));
-
-if(uniNo !=1 && uniNo != 2 && uniNo !=3 && uniNo != 4){
-   alert("You enter wrong number");
-}else{
-let major = parseInt(prompt("How many major you have: "));
-let minor = parseInt(prompt("How many minor you have: "));
-let practical = parseInt(prompt("How many practicals you have: "));
-
-let size = major + minor + practical;
-let totalCredits = major*3.00 + minor*2.0 + practical*1.0;
-let qualityPoints = 0;
-
-let majorGrades = [];
-let minorGrades = [];
-let pracGrades = [];
-
-
-for(let i =0; i < major; i++){
-   majorGrades[i] = prompt("What's your grade in major subject: ").toUpperCase().trim();
-   qualityPoints += point(majorGrades[i], uniNo)*3.0;
-}
-   
-for(let i = 0; i < minor; i++){
-   minorGrades[i] = prompt("What's your grade in minor subject: ").toUpperCase().trim();
-   qualityPoints += point(minorGrades[i], uniNo)*2.0;
-
-}
-
-for(let i = 0; i < practical; i++){
-   pracGrades[i] = prompt("What's your grade in practical: ").toUpperCase().trim();
-   qualityPoints += point(pracGrades[i], uniNo)*1.0;
-}
-
-let g = gpa(qualityPoints,totalCredits);
-alert(`GPA: ${g.toFixed(2)}`);
-
-function gpa(qPoints, tCredits){
-   return qPoints/tCredits;
-}
-
-function point(g, uniNo){
-   switch(uniNo){
-      case 1:{ // MUET
-      switch(g){
-         case 'A+': return 4.0;  
-         case 'A': return 3.5; 
-         case 'B+': return 3.0; 
-         case 'B': return 2.5;  
-         case 'C+': return 2.0;  
-         case 'C': return 1.5;  
-         case  'C-': return 1.0; 
-         case 'F': return 0.0;
-         default: return 0;  
-      }
-     }
-      break;
-
-      case 2: { //SAU
-         switch(g){
-            case 'A': return 4.00;  
-            case 'A-': return 3.67; 
-            case 'B+': return 3.33; 
-            case 'B': return 3.00;
-            case 'B-': return 2.67;  
-            case 'C+': return 2.33; 
-            case 'C': return 2.00; 
-            case 'C-': return 1.67;  
-            case 'D+': return 1.33;
-            case 'D': return 1.00; 
-            case 'F': return 0.0;  
-            default: return 0;
-         }
-      }
-      break;
-
-      case 3: { //US
-         switch(g){
-            case 'A+': return 4.00;  
-            case 'A': return 3.6; 
-            case 'B+': return 3.2; 
-            case 'B': return 2.8;
-            case 'C+': return 2.4;  
-            case 'C': return 2.0; 
-            case 'D+': return 1.5; 
-            case 'D': return 1.0; 
-            case 'F': return 0.00;
-            default: return 0;  
-         }
-      }
-      break;
-
-      case 4: { //QAU
-         switch(g){
-            case 'A': return 4.00;  
-            case 'A-': return 3.80; 
-            case 'B+': return 3.50; 
-            case 'B': return 3.00;
-            case 'B-': return 2.80;  
-            case 'C+': return 2.50; 
-            case 'C': return 2.00;  
-            case 'D': return 1.00; 
-            case 'F': return 0.0; 
-            default: return 0; 
-         }
-      }
-      break;
-
-      default: return 0;
+const gradingScales = {
+   muet: {
+      grades: { "A+": 4, A: 3.5, "B+": 3, B: 2.5, "C+": 2, C: 1.5, "C-": 1, F: 0 }
+   },
+   sau: {
+      grades: { A: 4, "A-": 3.67, "B+": 3.33, B: 3, "B-": 2.67, "C+": 2.33, C: 2, "C-": 1.67, "D+": 1.33, D: 1, F: 0 }
+   },
+   usindh: {
+      grades: { "A+": 4, A: 3.6, "B+": 3.2, B: 2.8, "C+": 2.4, C: 2, "D+": 1.5, D: 1, F: 0 }
+   },
+   qau: {
+      grades: { A: 4, "A-": 3.8, "B+": 3.5, B: 3, "B-": 2.8, "C+": 2.5, C: 2, D: 1, F: 0 }
    }
+};
+
+const creditWeights = { major: 3, minor: 2, practical: 1 };
+const universitySelect = document.querySelector("#university");
+const courseList = document.querySelector("#course-list");
+const emptyState = document.querySelector("#empty-state");
+const scaleHint = document.querySelector("#scale-hint");
+
+function addCourse(category = "major") {
+   const row = document.createElement("div");
+   row.className = "course-row";
+   row.innerHTML = `
+      <input class="course-name" type="text" maxlength="48" placeholder="e.g. Calculus" aria-label="Course name">
+      <select class="course-type" aria-label="Course type">
+         <option value="major">Major · 3 cr</option>
+         <option value="minor">Minor · 2 cr</option>
+         <option value="practical">Practical · 1 cr</option>
+      </select>
+      <div class="course-grade-cell"><select class="course-grade" aria-label="Course grade"></select><span class="grade-points" aria-hidden="true">—</span></div>
+      <button class="remove-course" type="button" aria-label="Remove course" title="Remove course">×</button>
+   `;
+   row.querySelector(".course-type").value = category;
+   courseList.append(row);
+   updateGradeOptions(row);
+   updateResults();
+   row.querySelector(".course-name").focus();
 }
+
+function updateGradeOptions(row) {
+   const gradeSelect = row.querySelector(".course-grade");
+   const previousGrade = gradeSelect.value;
+   const grades = gradingScales[universitySelect.value].grades;
+   gradeSelect.replaceChildren(new Option("Grade", ""));
+
+   Object.entries(grades).forEach(([grade, points]) => {
+      const option = new Option(grade, grade);
+      option.dataset.points = String(points);
+      gradeSelect.add(option);
+   });
+
+   if (Object.hasOwn(grades, previousGrade)) gradeSelect.value = previousGrade;
+   updateGradePoints(row);
 }
+
+function updateGradePoints(row) {
+   const gradeSelect = row.querySelector(".course-grade");
+   const points = gradeSelect.selectedOptions[0]?.dataset.points;
+   row.querySelector(".grade-points").textContent = points === undefined ? "—" : Number(points).toFixed(2);
+}
+
+function updateResults() {
+   const rows = [...courseList.querySelectorAll(".course-row")];
+   const gradedRows = rows.filter((row) => row.querySelector(".course-grade").value !== "");
+   const allGraded = rows.length > 0 && gradedRows.length === rows.length;
+   const credits = rows.reduce((total, row) => total + creditWeights[row.querySelector(".course-type").value], 0);
+   const qualityPoints = gradedRows.reduce((total, row) => {
+      const gradeSelect = row.querySelector(".course-grade");
+      const points = Number(gradeSelect.selectedOptions[0]?.dataset.points ?? 0);
+      return total + points * creditWeights[row.querySelector(".course-type").value];
+   }, 0);
+   const gpa = allGraded ? qualityPoints / credits : null;
+
+   document.querySelector("#credit-total").textContent = String(credits);
+   document.querySelector("#quality-total").textContent = allGraded ? qualityPoints.toFixed(2) : "—";
+   document.querySelector("#course-total").textContent = `${gradedRows.length} / ${rows.length}`;
+   document.querySelector("#gpa-value").textContent = gpa === null ? "—" : gpa.toFixed(2);
+   document.querySelector("#gpa-status").textContent = rows.length === 0
+      ? "Add a course to begin."
+      : allGraded
+         ? "All courses are graded."
+         : `Choose a grade for ${rows.length - gradedRows.length} more ${rows.length - gradedRows.length === 1 ? "course" : "courses"}.`;
+
+   const rating = gpa === null
+      ? "Ready when you are"
+      : gpa >= 3.7
+         ? "Outstanding work"
+         : gpa >= 3
+            ? "Strong semester"
+            : gpa >= 2
+               ? "Building momentum"
+               : "Keep moving forward";
+   document.querySelector("#gpa-rating").textContent = rating;
+
+   const progress = gpa === null ? 0 : (gpa / 4) * 100;
+   const gpaRing = document.querySelector("#gpa-ring");
+   gpaRing.style.background = `conic-gradient(var(--mint) ${progress}%, #36574b ${progress}%)`;
+   gpaRing.setAttribute("aria-label", gpa === null ? "GPA not calculated" : `GPA ${gpa.toFixed(2)} out of 4.00`);
+   emptyState.hidden = rows.length !== 0;
+}
+
+function updateScaleHint() {
+   const grades = gradingScales[universitySelect.value].grades;
+   scaleHint.textContent = `Available grades: ${Object.keys(grades).join(", ")}`;
+}
+
+document.querySelector("#add-course-button").addEventListener("click", () => addCourse());
+document.querySelector("#reset-button").addEventListener("click", () => {
+   universitySelect.value = "muet";
+   courseList.replaceChildren();
+   updateScaleHint();
+   addCourse();
+});
+
+courseList.addEventListener("click", (event) => {
+   const removeButton = event.target.closest(".remove-course");
+   if (!removeButton) return;
+   removeButton.closest(".course-row").remove();
+   updateResults();
+});
+
+courseList.addEventListener("change", (event) => {
+   const row = event.target.closest(".course-row");
+   if (!row) return;
+   if (event.target.matches(".course-grade")) updateGradePoints(row);
+   updateResults();
+});
+
+universitySelect.addEventListener("change", () => {
+   courseList.querySelectorAll(".course-row").forEach(updateGradeOptions);
+   updateScaleHint();
+   updateResults();
+});
+
+updateScaleHint();
+addCourse();
 
